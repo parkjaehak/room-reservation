@@ -1,24 +1,24 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16-alpine
     container_name: room_reservation_db
     environment:
       - POSTGRES_DB=room_reservation
-      - POSTGRES_USER=app_user
-      - POSTGRES_PASSWORD=app_password
+      - POSTGRES_USER=user1
+      - POSTGRES_PASSWORD=1234
       - TZ=UTC
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app_user -d room_reservation"]
+      test: ["CMD-SHELL", "pg_isready -U user1 -d room_reservation"]
       interval: 5s
       timeout: 3s
       retries: 10
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - room-reservation-network
 
   app:
     build:
@@ -27,8 +27,8 @@ services:
     container_name: room_reservation_app
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/room_reservation
-      - SPRING_DATASOURCE_USERNAME=app_user
-      - SPRING_DATASOURCE_PASSWORD=app_password
+      - SPRING_DATASOURCE_USERNAME=user1
+      - SPRING_DATASOURCE_PASSWORD=1234
       - SERVER_PORT=8080
       - TZ=UTC
     ports:
@@ -36,9 +36,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - room-reservation-network
 
 volumes:
   db-data:
     driver: local
 
-
+networks:
+  room-reservation-network:
+    driver: bridge

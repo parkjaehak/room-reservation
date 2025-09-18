@@ -8,12 +8,11 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    List<Reservation> findByRoomAndStartAtLessThanAndEndAtGreaterThan(
-            Room room,
-            OffsetDateTime endExclusive,
-            OffsetDateTime startExclusive
-    );
+    // 해당 날짜의 예약 조회
     List<Reservation> findByRoomAndStartAtBetween(Room room, OffsetDateTime start, OffsetDateTime end);
+    
+    // 시간 겹침 검증용 - 겹치는 예약이 있는지 확인
+    List<Reservation> findByRoomAndStartAtLessThanAndEndAtGreaterThan(Room room, OffsetDateTime endExclusive, OffsetDateTime startExclusive);
 }
 
 
