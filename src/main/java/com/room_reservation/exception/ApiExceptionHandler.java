@@ -28,8 +28,20 @@ public class ApiExceptionHandler {
                 .body(Map.of("message", ex.getMessage()));
     }
  
+    //400: EXCLUDE 제약조건 위반 (예약 시간 겹침)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        String message = ex.getMessage();
+        if (message != null && message.contains("exclusion constraint")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "해당 시간대에 이미 예약이 있습니다."));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", ex.getMessage()));
+    }
+
     //400: 잘못된 입력(시간 범위 포함)
-    @ExceptionHandler({ DataIntegrityViolationException.class, IllegalArgumentException.class, MethodArgumentNotValidException.class })
+    @ExceptionHandler({ IllegalArgumentException.class, MethodArgumentNotValidException.class })
     public ResponseEntity<?> handleBadRequestGenerics(Exception ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("message", ex.getMessage()));

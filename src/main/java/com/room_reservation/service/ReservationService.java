@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 
 
 @Service
@@ -43,6 +44,11 @@ public class ReservationService {
                 .build();
         Reservation savedReservation = reservationRepository.save(reservation);
 
+        // 한국 시간대로 변환
+        ZoneId koreaZone = ZoneId.of("Asia/Seoul");
+        OffsetDateTime startAtKorea = savedReservation.getStartAt().atZoneSameInstant(koreaZone).toOffsetDateTime();
+        OffsetDateTime endAtKorea = savedReservation.getEndAt().atZoneSameInstant(koreaZone).toOffsetDateTime();
+        
         return new ReservationResponse(
                 savedReservation.getId(),
                 savedReservation.getRoom().getId(),
@@ -50,8 +56,8 @@ public class ReservationService {
                 savedReservation.getRoom().getLocation(),
                 savedReservation.getRoom().getCapacity(),
                 savedReservation.getUserId(),
-                savedReservation.getStartAt(),
-                savedReservation.getEndAt()
+                startAtKorea,
+                endAtKorea
         );
     }
 

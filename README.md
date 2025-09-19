@@ -62,3 +62,7 @@ docker compose up --build
 5. **동시성 테스트 구현**
    - 멀티스레드 환경에서 동시 요청 테스트 방법
    - AtomicInteger와 ExecutorService 활용
+
+6. **시간대(Timezone) 처리 문제**
+   - 예약 생성 시 한국 시간(+09:00)과 가용성 조회 시 UTC 시간 불일치 해결
+   - AvailabilityService에서 ZoneId.of("Asia/Seoul") 사용하여 시간대 통일

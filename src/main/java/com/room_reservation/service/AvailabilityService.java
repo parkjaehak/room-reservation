@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,7 +23,9 @@ public class AvailabilityService {
     private final ReservationRepository reservationRepository;
 
     public List<AvailabilityResponse> getDaily(LocalDate date) {
-        OffsetDateTime dayStart = date.atStartOfDay().atOffset(ZoneOffset.UTC);
+        // 한국 시간대(UTC+9) 사용
+        ZoneId koreaZone = ZoneId.of("Asia/Seoul");
+        OffsetDateTime dayStart = date.atStartOfDay(koreaZone).toOffsetDateTime();
         OffsetDateTime dayEnd = dayStart.plusDays(1);
 
         List<Room> rooms = roomRepository.findAll();
@@ -34,10 +37,13 @@ public class AvailabilityService {
                     .sorted(Comparator.comparing(Reservation::getStartAt))
                     .toList();
 
-            // 예약된 시간대 목록 생성
+            // 예약된 시간대 목록 생성 (한국 시간대로 변환)
             List<AvailabilityResponse.TimeRange> reserved = new ArrayList<>();
             for (Reservation reservation : reservations) {
-                reserved.add(new AvailabilityResponse.TimeRange(reservation.getStartAt(), reservation.getEndAt()));
+                // UTC 시간을 한국 시간대로 변환
+                OffsetDateTime startAtKorea = reservation.getStartAt().atZoneSameInstant(koreaZone).toOffsetDateTime();
+                OffsetDateTime endAtKorea = reservation.getEndAt().atZoneSameInstant(koreaZone).toOffsetDateTime();
+                reserved.add(new AvailabilityResponse.TimeRange(startAtKorea, endAtKorea));
             }
 
             //예약된 시간 사이 빈 구간 조회
