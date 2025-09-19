@@ -35,7 +35,7 @@ public class ApiExceptionHandler {
                 .body(Map.of("message", ex.getMessage()));
     }
 
-    //400: 동시 예약으로 인한 Deadlock (예약 시간 겹침)
+    //400: 동시 예약으로 인한 예약 시간 겹침
     @ExceptionHandler(CannotAcquireLockException.class)
     public ResponseEntity<?> handleDeadlock(CannotAcquireLockException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
