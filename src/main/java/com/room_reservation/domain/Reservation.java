@@ -6,8 +6,7 @@ import lombok.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "reservations", 
-       uniqueConstraints = @UniqueConstraint(columnNames = {"room_id", "start_at", "end_at"}))
+@Table(name = "reservations")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,14 +32,6 @@ public class Reservation {
     @NotNull
     @Column(name = "end_at", nullable = false, columnDefinition = "timestamptz")
     private OffsetDateTime endAt;
-
-    @Column(name = "created_at", nullable = false, columnDefinition = "timestamptz")
-    private OffsetDateTime createdAt;
-
-    @PrePersist
-    void onCreate() {
-        this.createdAt = OffsetDateTime.now();
-    }
 }
 
 

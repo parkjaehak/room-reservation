@@ -13,21 +13,14 @@ CREATE TABLE IF NOT EXISTS reservations (
     user_id INT NOT NULL,
     start_at timestamptz NOT NULL,
     end_at timestamptz NOT NULL,
-    created_at timestamptz NOT NULL DEFAULT now(),
     -- 시간 경계는 [start, end)
     period tstzrange GENERATED ALWAYS AS (tstzrange(start_at, end_at, '[)')) STORED,
     -- 유효성 검사 - startAt < endAt
     CHECK (start_at < end_at),
-    -- 동시 예약 방지 - 같은 시간대 병렬 요청 10개 → 정확히 1건만 성공
+    -- 동시 예약 방지
     EXCLUDE USING gist (
         room_id WITH =,
         period WITH &&
     )
 );
-
--- 인덱스
-CREATE INDEX IF NOT EXISTS idx_reservations_room_start ON reservations(room_id, start_at);
-
-
-
 

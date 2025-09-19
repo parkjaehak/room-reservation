@@ -10,7 +10,6 @@ public record ReservationResponse(
         Integer roomCapacity,
         Long userId,
         OffsetDateTime startAt,
-        OffsetDateTime endAt,
-        OffsetDateTime createdAt
+        OffsetDateTime endAt
 ) {
 }

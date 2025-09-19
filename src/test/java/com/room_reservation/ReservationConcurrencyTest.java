@@ -3,7 +3,6 @@ package com.room_reservation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.room_reservation.config.TestContainersConfig;
 import com.room_reservation.domain.Room;
-import com.room_reservation.domain.Reservation;
 import com.room_reservation.repository.RoomRepository;
 import com.room_reservation.repository.ReservationRepository;
 import com.room_reservation.security.RequestUser;
@@ -26,14 +25,12 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.OffsetDateTime;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest

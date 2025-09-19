@@ -51,8 +51,7 @@ public class ReservationService {
                 savedReservation.getRoom().getCapacity(),
                 savedReservation.getUserId(),
                 savedReservation.getStartAt(),
-                savedReservation.getEndAt(),
-                savedReservation.getCreatedAt()
+                savedReservation.getEndAt()
         );
     }
 
