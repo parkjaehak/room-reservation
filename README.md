@@ -8,7 +8,7 @@
 docker compose up --build
 ```
 3. API 문서 확인 및 테스트
-- http://localhost:8080/swagger-ui/index.html
+   http://localhost:8080/swagger-ui/index.html
 
 
 
@@ -34,10 +34,11 @@ docker compose up --build
 
 
 ### 4) 테스트 검증 내용
-- **성공 기준**: 10개의 병렬 요청 중 정확히 1건만 성공 (HTTP 201)
-- **실패 기준**: 나머지 9건은 실패 (HTTP 400, "해당 시간대에 이미 예약이 있습니다.")
+- **성공 케이스**: 10개의 병렬 요청 중 정확히 1건만 성공 (HTTP 201)
+- **실패 케이스**: 나머지 9건은 실패 (HTTP 400, "해당 시간대에 이미 예약이 있습니다.")
 - **데이터 검증**: 데이터베이스에 저장된 예약이 정확히 1건인지 확인
 
 
 
 ## 3. LLM 사용구간
+- 
