@@ -6,7 +6,8 @@ import lombok.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "reservations")
+@Table(name = "reservations", 
+       uniqueConstraints = @UniqueConstraint(columnNames = {"room_id", "start_at", "end_at"}))
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

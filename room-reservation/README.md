@@ -1,45 +1,42 @@
-# Room Reservation
+# 회의실 예약 API
 
-## 실행 방법 (루트에서)
-1. Docker Desktop 실행
-2. 리포지토리 루트에서 실행
+## 실행 방법
+1. Docker Desktop 설치 및 실행 혹은 Docker Engine 실행
+2. Docker Compose 명령어 실행
 ```bash
-docker compose up -d --build
+docker compose up --build
 ```
-3. 확인
-- API: http://localhost:8080
-- DB: localhost:5432 (DB/app_user/app_password)
+3. API 문서 확인 및 테스트
+- http://localhost:8080/swagger-ui/index.html
 
-## 실행 방법 (room-reservation 디렉터리에서)
-```bash
-cd room-reservation
-docker compose up -d --build
+
+
+## 동시성 테스트 재현
+
+### 목표
+같은 시간대에 10개의 병렬 예약 요청을 보낼 때 정확히 1건만 성공한다.
+
+
+### 테스트 실행 방법
+1. Docker Desktop 실행 (TestContainers 사용)
+2. 테스트 실행 (PowerShell)
+```powershell
+.\gradlew test --tests "ReservationConcurrencyTest" 
 ```
 
-## API 토큰
-- ADMIN: `admin-token`
-- USER: `user-token-<id>` 예) `user-token-1`
-
-## 주요 엔드포인트
-- 방 등록(ADMIN)
-  - POST `/rooms`
-  - Body: `{ "name": "A", "location": "10F", "capacity": 8 }`
-  - Header: `Authorization: admin-token`
-- 가용성 조회
-  - GET `/rooms?date=YYYY-MM-DD`
-- 예약 생성(USER)
-  - POST `/reservations`
-  - Body: `{ "roomId": 1, "startAt": "2025-09-17T09:00:00Z", "endAt": "2025-09-17T10:00:00Z" }`
-  - Header: `Authorization: user-token-1`
-- 예약 취소
-  - DELETE `/reservations/{id}`
-
-## 동시성/무결성
-- PostgreSQL `tstzrange` + `EXCLUDE USING gist`로 같은 방(room_id)에서 겹치는 시간대 예약 차단
-- 반개구간 `[start_at, end_at)` 사용
-
-## 개발 참고
-- 환경변수로 DB 접속정보 오버라이드 가능
-- 스키마는 `db/init`의 SQL로 초기화됨(최초 볼륨 생성 시)
+### 테스트 시나리오
+1. 테스트용 회의실1 생성
+2. 동일한 시간대에 10개의 병렬 예약 요청 생성
+3. 각 요청은 서로 다른 사용자 (`user-token-1` ~ `user-token-10`)로 시뮬레이션
+4. 모든 요청이 완료될 때까지 대기
+5. 성공/실패 개수 및 데이터베이스 상태 검증
 
 
+### 테스트 검증 내용
+- **성공 기준**: 10개의 병렬 요청 중 정확히 1건만 성공 (HTTP 201)
+- **실패 기준**: 나머지 9건은 실패 (HTTP 400, "해당 시간대에 이미 예약이 있습니다.")
+- **데이터 검증**: 데이터베이스에 저장된 예약이 정확히 1건인지 확인
+
+
+
+## LLM 사용구간

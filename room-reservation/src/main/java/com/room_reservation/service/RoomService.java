@@ -20,8 +20,7 @@ public class RoomService {
                 .capacity(capacity)
                 .build();
         Room savedRoom = roomRepository.save(room);
-        
-        // 엔티티를 DTO로 변환
+
         return new RoomResponse(
                 savedRoom.getId(),
                 savedRoom.getName(),

@@ -1,3 +1,7 @@
+-- 테스트용 초기화 스크립트
+-- btree_gist 확장 설치
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
 -- 회의실 테이블 - 이름/위치/수용인원 등록
 CREATE TABLE IF NOT EXISTS rooms (
     id SERIAL PRIMARY KEY,
@@ -29,5 +33,7 @@ CREATE TABLE IF NOT EXISTS reservations (
 CREATE INDEX IF NOT EXISTS idx_reservations_room_start ON reservations(room_id, start_at);
 
 
-
-
+-- 회의실 생성 
+INSERT INTO rooms (id, name, location, capacity)
+VALUES (1, '회의실1', '서울시 강남구', 10)
+ON CONFLICT (id) DO NOTHING;

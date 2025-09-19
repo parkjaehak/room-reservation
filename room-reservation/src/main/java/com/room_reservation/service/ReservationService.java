@@ -11,6 +11,7 @@ import com.room_reservation.security.RequestUser;
 import com.room_reservation.security.RequestUserHolder;
 import com.room_reservation.security.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,16 +26,13 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse create(Long roomId, OffsetDateTime startAt, OffsetDateTime endAt) {
-        Room room = roomRepository.findById(roomId).orElseThrow(NotFoundException::new);
+        Room room = roomRepository.findById(roomId)
+            .orElseThrow(() -> new NotFoundException("방을 찾을 수 없습니다."));
+
 
         RequestUser user = RequestUserHolder.get();
         if (user == null || user.userId() == null) {
-            throw new ForbiddenException();
-        }
-        
-        // 시간 겹침 검증 - 동일 방에서 겹치는 시간이 있는지 확인
-        if (hasOverlappingReservation(room, startAt, endAt)) {
-            throw new IllegalArgumentException("해당 시간대에 이미 예약이 있습니다");
+            throw new NotFoundException("사용자를 찾을 수 없습니다.");
         }
         
         Reservation reservation = Reservation.builder()
@@ -44,8 +42,7 @@ public class ReservationService {
                 .endAt(endAt)
                 .build();
         Reservation savedReservation = reservationRepository.save(reservation);
-        
-        // 엔티티를 DTO로 변환
+
         return new ReservationResponse(
                 savedReservation.getId(),
                 savedReservation.getRoom().getId(),
@@ -61,23 +58,18 @@ public class ReservationService {
 
     @Transactional
     public void cancel(Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NotFoundException::new);
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NotFoundException("예약 정보를 찾을 수 없습니다."));
         RequestUser user = RequestUserHolder.get();
 
         if (user == null) {
-            throw new ForbiddenException();
+            throw new NotFoundException("사용자를 찾을 수 없습니다.");
         }
         // Admin 이거나 예약 소유자만 취소 가능
         if (user.role() != Role.ADMIN && !user.userId().equals(reservation.getUserId())) {
-            throw new ForbiddenException();
+            throw new ForbiddenException("해당 자원에 접근할 권한이 없습니다.");
         }
         reservationRepository.delete(reservation);
-    }
-    
-    // 시간 겹침 검증 메서드
-    private boolean hasOverlappingReservation(Room room, OffsetDateTime startAt, OffsetDateTime endAt) {
-        // 겹치는 예약이 있는지 확인: (startAt < existing.endAt) && (endAt > existing.startAt)
-        return !reservationRepository.findByRoomAndStartAtLessThanAndEndAtGreaterThan(room, endAt, startAt).isEmpty();
     }
 }
 
