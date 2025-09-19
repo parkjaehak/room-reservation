@@ -11,6 +11,8 @@ docker compose up --build
    http://localhost:8080/swagger-ui/index.html
 
 
+<br>
+
 
 ## 2. 동시성 테스트 재현
 
@@ -37,11 +39,12 @@ docker compose up --build
 - **성공 케이스**: 10개의 병렬 요청 중 정확히 1건만 성공 (HTTP 201)
 - **실패 케이스**: 나머지 9건은 실패 (HTTP 400, "해당 시간대에 이미 예약이 있습니다.")
 - **데이터 검증**: 데이터베이스에 저장된 예약이 정확히 1건인지 확인
+  
+
+<br>
 
 
-
-
-### 주요 질문 및 프롬프트
+## 3. 주요 질문 및 프롬프트
 
 1. **TestContainers 설정**
    - PostgreSQL 컨테이너 기반 테스트 환경 구성
